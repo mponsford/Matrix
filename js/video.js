@@ -77,7 +77,13 @@ class video
         this.canvas.width = this.width;
 
         try {
-            this.stream = await navigator.mediaDevices.getUserMedia({video: true});
+            this.stream = await navigator.mediaDevices.getUserMedia(
+                {
+                    video: {
+                        facingMode: 'environment',
+                    }
+                }
+            );
         } catch(err) {
             console.log(err);
         }
