@@ -109,7 +109,9 @@ class video
         this.elementCount = 1;
 
         if ( (Math.random() * 100) > 3.5 ) {
-            this.elementArray[Math.floor(Math.random() * this.columns)].opacity = 1;
+            if (this.elementArray[Math.floor(Math.random() * this.columns)]) {
+                this.elementArray[Math.floor(Math.random() * this.columns)].opacity = 1;
+            }
         }
 
         for (let y = 0; y < this.height; y += this.sampleSize) {
@@ -155,7 +157,7 @@ class video
         }
 
         this.drawing = true;
-            this.ctx.drawImage(this.video, 0, 0, this.width, this.height);
+            //this.ctx.drawImage(this.video, 0, 0, this.width, this.height);
             this.rawData = this.ctx.getImageData(0, 0, this.width, this.height).data;
             for (let i = 1; i < this.elementArray.length; i++) {
                 // Letter
