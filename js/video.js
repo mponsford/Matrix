@@ -9,8 +9,9 @@ class video
    {
         this.sampleSize = 11;
         this.widthPreCorrection = window.outerWidth;
+        this.heightPreCorrection = window.outerHeight;
         this.width = this.widthPreCorrection - (this.widthPreCorrection % this.sampleSize);
-        this.height = this.width * (9/16);
+        this.height = this.heightPreCorrection - (this.heightPreCorrection % this.sampleSize);;
         this.columns = this.width / this.sampleSize;
         this.minFontSize = this.sampleSize - 4;
         this.columnFontSize = [];
