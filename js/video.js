@@ -36,7 +36,7 @@ class video
 
     setup()
     {
-        document.documentElement.webkitRequestFullScreen();
+
 
         // Dynamically Set the font size of the columns
         for (let i = 0; i < this.columns; i++) {
