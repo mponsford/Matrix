@@ -7,13 +7,13 @@ class video
 
    init()
    {
-        this.sampleSize = 12;
+        this.sampleSize = 15;
         this.widthPreCorrection = window.outerWidth;
         this.heightPreCorrection = window.outerHeight;
         this.width = this.widthPreCorrection - (this.widthPreCorrection % this.sampleSize);
         this.height = this.heightPreCorrection - (this.heightPreCorrection % this.sampleSize);;
         this.columns = this.width / this.sampleSize;
-        this.minFontSize = this.sampleSize - 4;
+        this.minFontSize = this.sampleSize - 5;
         this.columnFontSize = [];
         this.video = document.getElementById('video');
         this.canvas = document.getElementById('canvas');
@@ -40,7 +40,7 @@ class video
 
         // Dynamically Set the font size of the columns
         for (let i = 0; i < this.columns; i++) {
-            this.columnFontSize[i] = this.minFontSize + (Math.floor(Math.random() * 8));
+            this.columnFontSize[i] = this.minFontSize + (Math.floor(Math.random() * 10));
         }
 
         // Build the AsciArray from the asci String
@@ -106,10 +106,8 @@ class video
     {
         this.elementCount = 1;
 
-        if ( (Math.random() * 100) > 3.5 ) {
-            if (this.elementArray[Math.floor(Math.random() * this.columns)]) {
-                this.elementArray[Math.floor(Math.random() * this.columns)].opacity = 1;
-            }
+        if ( (Math.random() * 100) > 35 ) {
+            this.elementArray[Math.ceil(Math.random() * this.columns)].opacity = 1;
         }
 
         for (let y = 0; y < this.height; y += this.sampleSize) {
@@ -120,8 +118,8 @@ class video
                 let char = this.asci[Math.floor(this.asciLength * (average / 255))];
 
                 if (
-                    this.elementArray[this.elementCount].average >= average + 40
-                    || this.elementArray[this.elementCount].average <= average - 40
+                    this.elementArray[this.elementCount].average >= average + 30
+                    || this.elementArray[this.elementCount].average <= average - 30
                 ) {
                     this.elementArray[this.elementCount].char = char;
                     this.elementArray[this.elementCount].opacity = 0.7;
@@ -157,18 +155,18 @@ class video
         this.drawing = true;
             this.ctx.drawImage(this.video, 0, 0, this.width, this.height);
             this.rawData = this.ctx.getImageData(0, 0, this.width, this.height).data;
+            this.ctx.fillStyle = "rgba(0, 0, 0, 1)";
+            this.ctx.fillRect(0, 0, this.width, this.height);
             for (let i = 1; i < this.elementArray.length; i++) {
 
                 // Letter
                 if (this.elementArray[i].opacity > 0.1) {
-                    this.ctx.fillStyle = "rgba(0, 143, 17," + this.elementArray[i].opacity + ")";
+                    this.ctx.fillStyle = "rgba(227, 233, 58," + this.elementArray[i].opacity + ")";
                     this.ctx.font = this.elementArray[i].fontSize + ' Helvetica';
+                    this.ctx.shadowBlur = 2;
+                    this.ctx.shadowColor = "rgba(227, 233, 58, 1)";
                     this.ctx.fillText(this.elementArray[i].char, this.elementArray[i].x, this.elementArray[i].y);
                 }
-
-                // Background
-                this.ctx.fillStyle = "rgba(0,0,0,1)";
-                this.ctx.fillRect(this.elementArray[i].x, this.elementArray[i].y, this.sampleSize, this.sampleSize);
             }
         this.drawing = false;
     }
