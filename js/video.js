@@ -93,7 +93,7 @@ class video
     playCanvas()
     {
         this.update.bind(this)
-        this.logic = setInterval(this.update.bind(this), 17);
+        this.logic = setInterval(this.update.bind(this), 34);
         this.canvasDraw = setInterval(this.draw.bind(this), 17);
     }
 
@@ -106,7 +106,7 @@ class video
     {
         this.elementCount = 1;
 
-        if ( (Math.random() * 100) > 7 ) {
+        if ( (Math.random() * 100) > 3.5 ) {
             this.elementArray[Math.floor(Math.random() * this.columns)].opacity = 1;
         }
 
@@ -151,6 +151,7 @@ class video
         if (this.drawing) {
             return;
         }
+
         this.drawing = true;
             this.ctx.drawImage(this.video, 0, 0, this.width, this.height);
             this.rawData = this.ctx.getImageData(0, 0, this.width, this.height).data;
