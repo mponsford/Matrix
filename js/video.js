@@ -7,9 +7,9 @@ class video
 
    init()
    {
-        this.sampleSize = 11;
-        this.widthPreCorrection = 1000;
-        this.heightPreCorrection = this.widthPreCorrection * (9/16);
+        this.sampleSize = 12;
+        this.widthPreCorrection = window.outerWidth;
+        this.heightPreCorrection = window.outerHeight;
         this.width = this.widthPreCorrection - (this.widthPreCorrection % this.sampleSize);
         this.height = this.heightPreCorrection - (this.heightPreCorrection % this.sampleSize);;
         this.columns = this.width / this.sampleSize;
@@ -81,9 +81,7 @@ class video
         try {
             this.stream = await navigator.mediaDevices.getUserMedia(
                 {
-                    video: {
-                        facingMode: 'environment',
-                    }
+                    video: true,
                 }
             );
         } catch(err) {
@@ -157,13 +155,16 @@ class video
         }
 
         this.drawing = true;
-            //this.ctx.drawImage(this.video, 0, 0, this.width, this.height);
+            this.ctx.drawImage(this.video, 0, 0, this.width, this.height);
             this.rawData = this.ctx.getImageData(0, 0, this.width, this.height).data;
             for (let i = 1; i < this.elementArray.length; i++) {
+
                 // Letter
-                this.ctx.fillStyle = "rgba(0, 143, 17," + this.elementArray[i].opacity + ")";
-                this.ctx.font = this.elementArray[i].fontSize + ' Helvetica';
-                this.ctx.fillText(this.elementArray[i].char, this.elementArray[i].x, this.elementArray[i].y);
+                if (this.elementArray[i].opacity > 0.1) {
+                    this.ctx.fillStyle = "rgba(0, 143, 17," + this.elementArray[i].opacity + ")";
+                    this.ctx.font = this.elementArray[i].fontSize + ' Helvetica';
+                    this.ctx.fillText(this.elementArray[i].char, this.elementArray[i].x, this.elementArray[i].y);
+                }
 
                 // Background
                 this.ctx.fillStyle = "rgba(0,0,0,1)";
