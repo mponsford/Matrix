@@ -8,8 +8,8 @@ class video
    init()
    {
         this.sampleSize = 11;
-        this.widthPreCorrection = window.outerWidth;
-        this.heightPreCorrection = window.outerHeight;
+        this.widthPreCorrection = 1000;
+        this.heightPreCorrection = this.widthPreCorrection * (9/16);
         this.width = this.widthPreCorrection - (this.widthPreCorrection % this.sampleSize);
         this.height = this.heightPreCorrection - (this.heightPreCorrection % this.sampleSize);;
         this.columns = this.width / this.sampleSize;
