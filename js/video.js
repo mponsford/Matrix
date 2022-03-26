@@ -94,7 +94,7 @@ class video
     {
         this.update.bind(this)
         this.logic = setInterval(this.update.bind(this), 34);
-        this.canvasDraw = setInterval(this.draw.bind(this), 17);
+        this.canvasDraw = setInterval(this.draw.bind(this), 34);
     }
 
     updateDiv(char, status)
@@ -106,9 +106,7 @@ class video
     {
         this.elementCount = 1;
 
-        if ( (Math.random() * 100) > 35 ) {
-            this.elementArray[Math.ceil(Math.random() * this.columns)].opacity = 1;
-        }
+        this.elementArray[Math.ceil(Math.random() * this.columns)].opacity = 1;
 
         for (let y = 0; y < this.height; y += this.sampleSize) {
             for (let x = 0; x < this.width; x += this.sampleSize) {
