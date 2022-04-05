@@ -7,7 +7,7 @@ class video
 
    init()
    {
-        this.sampleSize = 15;
+        this.sampleSize = 10;
         this.widthPreCorrection = window.outerWidth;
         this.heightPreCorrection = window.outerHeight;
         this.width = this.widthPreCorrection - (this.widthPreCorrection % this.sampleSize);
@@ -25,10 +25,9 @@ class video
         this.stream = null;
         this.canvasDraw = null;
         this.drawing = false;
-        this.asciString = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'.";
+        this.asciString = "$@`B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'.";
         this.asci = [];
         this.asciLength = 0;
-        this.container = document.getElementById('container');
         this.setup()
         this.initialiseVideo()
         this.playCanvas()
@@ -36,8 +35,6 @@ class video
 
     setup()
     {
-
-
         // Dynamically Set the font size of the columns
         for (let i = 0; i < this.columns; i++) {
             this.columnFontSize[i] = this.minFontSize + (Math.floor(Math.random() * 10));
@@ -51,24 +48,17 @@ class video
         this.asciLength = this.asci.length - 1;
 
         // Create all the elements for display on the page.
-        for (var i = 0; i < (Math.floor(this.width / this.sampleSize) * Math.floor(this.height / this.sampleSize)); i++) {
-            this.makeElement();
-        }
-    }
+        for (let y = 0; y < this.height; y += this.sampleSize) {
+            for (let x = 0; x < this.width; x += this.sampleSize) {
+                let p = new pixel();
+                p.setX(x);
+                p.setY(y);
+                //p.setFontSize(this.columnFontSize[this.columns % x] + 'px');
 
-    makeElement()
-    {
-        let elementData = {
-            fontSize: this.columnFontSize[this.elementCount % this.columns] + 'px',
-            opacity: 0.4,
-            average: 255,
-            char: '!',
-            x: 0,
-            y: 0,
+                this.elementArray[this.elementCount] = p;
+                this.elementCount++;
+            }
         }
-
-        this.elementArray[this.elementCount] = elementData;
-        this.elementCount++;
     }
 
     async initialiseVideo()
@@ -97,73 +87,64 @@ class video
         this.canvasDraw = setInterval(this.draw.bind(this), 34);
     }
 
-    updateDiv(char, status)
-    {
-
-    }
-
-    update()
+    async update()
     {
         this.elementCount = 1;
+        this.elementArray[Math.ceil(Math.random() * this.columns)].setOpacity(1);
 
-        this.elementArray[Math.ceil(Math.random() * this.columns)].opacity = 1;
+        for (let i = 1; i < this.elementArray.length; i++) {
+            let currentElement = this.elementArray[i];
+            let p = (currentElement.x + (currentElement.y * this.width)) * 4;
+            let average = (0.2126 * this.rawData[p]) + (0.7152 * this.rawData[p + 1]) + (0.0722 * this.rawData[p + 2]);
+            let char = this.asci[Math.floor(this.asciLength * (average / 255))];
+            let aboveElement = null;
 
-        for (let y = 0; y < this.height; y += this.sampleSize) {
-            for (let x = 0; x < this.width; x += this.sampleSize) {
-                let p = (x + (y * this.width)) * 4;
-                // let average = (0.299 * this.rawData[p]) + (0.587 * this.rawData[p + 1]) + (0.114 * this.rawData[p + 2]);
-                let average = (0.2126 * this.rawData[p]) + (0.7152 * this.rawData[p + 1]) + (0.0722 * this.rawData[p + 2]);
-                let char = this.asci[Math.floor(this.asciLength * (average / 255))];
-
-                if (
-                    this.elementArray[this.elementCount].average >= average + 30
-                    || this.elementArray[this.elementCount].average <= average - 30
-                ) {
-                    this.elementArray[this.elementCount].char = char;
-                    this.elementArray[this.elementCount].opacity = 0.7;
-                }
-
-                if (
-                    this.elementCount > this.columns
-                    && this.elementArray[this.elementCount - this.columns].opacity >= 0.7
-                    && this.elementArray[this.elementCount - this.columns].opacity <= 0.8
-                ) {
-                    this.elementArray[this.elementCount].opacity = 1;
-                }
-
-                this.elementArray[this.elementCount].average = average
-                this.elementArray[this.elementCount].x = x;
-                this.elementArray[this.elementCount].y = y;
-
-                if (this.elementArray[this.elementCount].opacity >= 0.1) {
-                    this.elementArray[this.elementCount].opacity -= 0.1;
-                }
-
-                this.elementCount ++;
+            if (i > this.columns) {
+                aboveElement = this.elementArray[i - this.columns];
             }
+
+            if (
+                currentElement.getAverage() >= average + 25
+                || currentElement.getAverage() <= average - 25
+            ) {
+                currentElement.setAverage(average);
+                currentElement.setChar(char);
+                currentElement.setOpacity(0.7);
+            }
+
+            // Seed Opacity
+            if (
+                aboveElement
+                && aboveElement.getOpacity() >= 0.7
+                && aboveElement.getOpacity() <= 0.8
+            ) {
+                currentElement.setOpacity(1);
+            }
+
+            currentElement.fade()
+
+            this.elementArray[i] = currentElement;
         }
     }
 
-    draw()
+    async draw()
     {
-        if (this.drawing) {
+        if (this.drawing === true) {
             return;
         }
-
         this.drawing = true;
             this.ctx.drawImage(this.video, 0, 0, this.width, this.height);
             this.rawData = this.ctx.getImageData(0, 0, this.width, this.height).data;
             this.ctx.fillStyle = "rgba(0, 0, 0, 1)";
             this.ctx.fillRect(0, 0, this.width, this.height);
             for (let i = 1; i < this.elementArray.length; i++) {
-
-                // Letter
-                if (this.elementArray[i].opacity > 0.1) {
-                    this.ctx.fillStyle = "rgba(227, 233, 58," + this.elementArray[i].opacity + ")";
-                    this.ctx.font = this.elementArray[i].fontSize + ' Helvetica';
-                    this.ctx.shadowBlur = 2;
+                let pixel = this.elementArray[i];
+                if (pixel.getOpacity() >= 0.1) {
+                    this.ctx.fillStyle = "rgba(227, 233, 58," + pixel.getOpacity() + ")";
+                    this.ctx.font = pixel.getFontSize() + ' Helvetica';
+                    this.ctx.shadowBlur = 10;
                     this.ctx.shadowColor = "rgba(227, 233, 58, 1)";
-                    this.ctx.fillText(this.elementArray[i].char, this.elementArray[i].x, this.elementArray[i].y);
+                    this.ctx.fillText(pixel.char, pixel.x, pixel.y);
                 }
             }
         this.drawing = false;
